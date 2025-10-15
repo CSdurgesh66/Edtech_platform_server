@@ -14,6 +14,14 @@ exports.createCategory = async (req, res) => {
             });
         }
 
+        const category = await Category.findOne({ name, description });
+        if (category) {
+            return res.json({
+                success: false,
+                message: 'Already created '
+            })
+        }
+
         // create in db 
         const categoryDetails = await Category.create({
             name: name,
@@ -85,31 +93,31 @@ exports.categoryPageDetails = async (req, res) => {
         }).populate('courses').exec();
 
         const allCategories = await Category.find()
-        .populate({
-          path: "courses",
-          match: { status: "Published" },
-          populate: {
-            path: "instructor",
-        },
-        })
-        .exec()
-      const allCourses = allCategories.flatMap((category) => category.courses)
-      const mostSellingCourses = allCourses
-        .sort((a, b) => b.sold - a.sold)
-        .slice(0, 10)
+            .populate({
+                path: "courses",
+                match: { status: "Published" },
+                populate: {
+                    path: "instructor",
+                },
+            })
+            .exec()
+        const allCourses = allCategories.flatMap((category) => category.courses)
+        const mostSellingCourses = allCourses
+            .sort((a, b) => b.sold - a.sold)
+            .slice(0, 10)
 
         // return response
 
         res.status(200).json({
-        success: true,
-        data: {
-          selectedCategoryDetails,
-          differentCategories,
-          mostSellingCourses,
-        },
-        message: 'Category page details returned successfully',
-      })
-       
+            success: true,
+            data: {
+                selectedCategoryDetails,
+                differentCategories,
+                mostSellingCourses,
+            },
+            message: 'Category page details returned successfully',
+        })
+
 
     } catch (err) {
         return res.status(500).json({

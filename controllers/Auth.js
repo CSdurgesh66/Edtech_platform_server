@@ -5,7 +5,7 @@ const otpGenerator = require('otp-generator');
 const mailSender = require("../utils/mailSender")
 const bcrypt = require('bcrypt'); 
 //* const bcrypt = require('bcryptjs')-> this is lighter version, both are same 
-const { passwordUpdate } = require("../mail/templates/passwordUpdate");
+const { passwordUpdated } = require("../mail/templates/passwordUpdate.js");
 const Profile = require("../models/Profile");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -45,6 +45,7 @@ exports.sendOTP = async (req, res) => {
                 upperCaseAlphabets: false,
                 specialChars: false
             });
+            checkOtp = await OTP.findOne({ otp: otp });
         }
         const otpPayload = { email, otp };
         // save otp in db /entry in db
@@ -253,7 +254,7 @@ exports.changePassword = async (req, res) => {
         // hass password and update password  ************* add different way
         const hashedPassword = await bcrypt.hash(newpassword, 10);
         userDetails.password = hashedPassword;
-        await userDetails.save();
+        
 
         // send notification email
         try {
@@ -261,11 +262,12 @@ exports.changePassword = async (req, res) => {
                 userDetails.email,
                 "Password for your account has been changed",
                 passwordUpdated(
-                    userDetails.name,
+                    userDetails.email,
                     `password updated successfully for ${userDetails.firstName} ${userDetails.lastName}`
                 )
             )
             console.log("Email sent successfully", emailResponse);
+            await userDetails.save();
         } catch (error) {
             console.error("Error occurred while sending email:", error)
             return res.status(500).json({

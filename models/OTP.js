@@ -38,7 +38,7 @@ async function sendVerificationEmail(email,otp) {
 }
 
 
-// define a pre save hook to send email after saving a document
+// define a pre save hook to send email before saving a document
 OTPSchema.pre("save",async function (next) {
     console.log("new document saved to database");
 

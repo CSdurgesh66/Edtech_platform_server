@@ -40,7 +40,7 @@ router.post("/addSubSection", auth, isInstructor, createSubSection);
 
 router.post("/editCourse", auth, isInstructor, editCourse);
 router.get("/getInstructorCourses", auth, isInstructor, getInstructorCourses);
-router.delete("/deleteCourse", deleteCourse);
+router.delete("/deleteCourse/:courseId", deleteCourse);
 
 router.get("/getAllCourses", getAllCourses);
 router.post("/getCourseDetails", getCourseDetails);
